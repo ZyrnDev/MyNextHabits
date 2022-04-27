@@ -2,7 +2,7 @@ import { Button, Container, Heading } from "@chakra-ui/react";
 import Layout from "@components/layouts/centered";
 import { MetaOptions } from "@components/meta";
 import Ping from "@components/ping";
-import CreateUser from "@components/users";
+import { CreateUser, DeleteUser } from "@components/users";
 import { useEffect } from "react";
 
 const meta: MetaOptions = {
@@ -17,6 +17,7 @@ export default function Home() {
       <Heading size="3xl">Hello Next.js</Heading>
       <Ping />
       <CreateUser />
+      <DeleteUser />
     {/* </Container> */}
     </Layout>
   );
