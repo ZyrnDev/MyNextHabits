@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 class Request<RequestData = any, ResponseData = any> {
     private url: string;
     private method: string = "GET";
+    private autoRequest: boolean = false;
     private dataState = useState<ResponseData | undefined>(undefined);
     private errorState = useState<Error | undefined>(undefined);
   
@@ -13,10 +14,15 @@ class Request<RequestData = any, ResponseData = any> {
     public get error(): Error | undefined {
       return this.errorState[0];
     }
+
+    public get auto_request(): boolean {
+      return this.autoRequest;
+    }
   
-    constructor(url: string, method: string = "GET") {
+    constructor(url: string, method: string = "GET", autoRequest: boolean = false) {
       this.url = url;
       this.method = method;
+      this.autoRequest = autoRequest;
     }
   
     private setData(data: ResponseData): void {
@@ -32,7 +38,9 @@ class Request<RequestData = any, ResponseData = any> {
     public send(data: RequestData): void {
       fetch(this.url, { method: this.method, body: data ? JSON.stringify(data) : undefined } ).then(res => {
         if (res.ok) {
-          res.json().then(data => this.setData(data));
+          res.json()
+            .then(data => this.setData(data))
+            .catch(err => this.setError(err));
         } else {
           throw new Error(res.statusText);
         }
@@ -46,12 +54,13 @@ export type Response<RequestData, ResponseData> = {
   refresh: (data: RequestData) => void;
 }
 
-export function useApiAction<RequestData, ResponseData>(data: RequestData, endpoint: string, method: string = "GET"): Response<RequestData, ResponseData> {
-  const request = new Request<RequestData, ResponseData>("http://localhost:8080" + endpoint, method);
+export function useApiAction<RequestData, ResponseData>(data: RequestData, endpoint: string, method: string = "GET", autoRequest: boolean = false): Response<RequestData, ResponseData> {
+  const request = new Request<RequestData, ResponseData>("http://localhost:8080" + endpoint, method, autoRequest);
   
   useEffect(() => {
-    request.send(data);
-    console.log("Request sent");
+    if (request.auto_request) {
+      request.send(data);
+    }
   }, [data]);
   
   return {

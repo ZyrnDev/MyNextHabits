@@ -1,35 +1,32 @@
 import { Button, Container, Divider, Heading } from "@chakra-ui/react";
+import { CreateHabit, DeleteHabit, GetHabits, UpdateHabit } from "@components/habits";
 import Layout from "@components/layouts/centered";
 import { MetaOptions } from "@components/meta";
-import Ping from "@components/ping";
-import { CreateUser, DeleteUser, GetUsers, UpdateUser } from "@components/users";
 
 const meta: MetaOptions = {
-  title: "Home",
+  title: "Habits",
   description: "DO THIS LATER IDOT",
 };
 
-export default function Home() {
+export default function Habits() {
   return (
     <Layout meta={meta}>
    {/* <Container size="lg" padding="0.5rem"> */}
-      <Heading size="3xl">Hello Next.js</Heading>
+      <Heading size="3xl">Habits</Heading>
       <Divider marginBlock={"1.5rem"} />
 
-      <Ping />
+      <GetHabits />
       <Divider marginBlock={"1.5rem"} />
 
-      <GetUsers />
+      <CreateHabit />
       <Divider marginBlock={"1.5rem"} />
 
-      <CreateUser />
+      <UpdateHabit />
       <Divider marginBlock={"1.5rem"} />
 
-      <UpdateUser />
+      <DeleteHabit />
       <Divider marginBlock={"1.5rem"} />
 
-      <DeleteUser />
-      <Divider marginBlock={"1.5rem"} />
     {/* </Container> */}
     </Layout>
   );
