@@ -1,0 +1,11 @@
+# Docker files not required inside the images
+.dockerignore
+Dockerfile
+
+# Local Node.js Files
+node_modules
+.next
+
+# Non-functional files
+README.md
+.gitignore

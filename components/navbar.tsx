@@ -6,9 +6,8 @@ import { Link, ThemeToggleButton } from '@components/core';
 
 type LinkType = { href: string; label: string }
 const LINKS: LinkType[] = [
-  { href: '/about', label: 'About' },
-  // { href: '/blog', label: 'Blog' },
-  // { href: '/test', label: 'Test' },
+  { href: '/users', label: 'Users' },
+  { href: '/habits', label: 'Habits' },
 ];
 
 const Navbar: FC<ButtonGroupProps> = ({ m, ...props }) => {
