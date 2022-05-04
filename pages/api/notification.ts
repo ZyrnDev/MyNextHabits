@@ -9,15 +9,24 @@ webPush.setVapidDetails(
 )
 
 const notifcation = async (req: NextApiRequest, res: NextApiResponse) => {
+  const notfication = {
+    title: 'Notification Gang',
+    body: 'Join Us',
+    vibrate: [100, 50, 100],
+    actions: [
+      {action: 'close', title: 'Close notification',
+        icon: 'images/gigachad.jpg'},
+    ]
+  }
   if (req.method == 'POST') {
     const { subscription } = req.body as { subscription: PushSubscription }
-    ForwardNotification(res, subscription, {title: 'Direct Response Web Push', message: 'Your web push notification is here!'})
+    await ForwardNotification(res, subscription, notfication)
     const sleep = promisify(setTimeout)
 
-    for (let i = 0; i < 10; i++) {
-      await sleep(2000)
-      SendNotification(subscription, {title: 'Indirect Response Web Push', message: 'Your web push notification is here!'})
-    }    
+    // for (let i = 0; i < 10; i++) {
+    //   await sleep(2000)
+    //   SendNotification(subscription, {title: 'Indirect Response Web Push', body: 'Your web push notification is here!'})
+    // }    
     
   } else {
     res.statusCode = 405
@@ -30,7 +39,7 @@ const SendNotification = (subscription: PushSubscription, payload: any) => {
 }
 
 const ForwardNotification = (res: NextApiResponse, subscription: PushSubscription, payload: any) => {
-  SendNotification(subscription, payload)
+  return SendNotification(subscription, payload)
     .then(response => {
       res.writeHead(response.statusCode, response.headers).end(response.body)
     })

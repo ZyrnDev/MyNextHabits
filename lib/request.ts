@@ -55,7 +55,7 @@ export type Response<RequestData, ResponseData> = {
 }
 
 export function useApiAction<RequestData, ResponseData>(data: RequestData, endpoint: string, method: string = "GET", autoRequest: boolean = false): Response<RequestData, ResponseData> {
-  const request = new Request<RequestData, ResponseData>("http://localhost:8080" + endpoint, method, autoRequest);
+  const request = new Request<RequestData, ResponseData>(process.env.NEXT_PUBLIC_BACKEND_URL + endpoint, method, autoRequest);
   
   useEffect(() => {
     if (request.auto_request) {

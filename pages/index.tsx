@@ -38,11 +38,11 @@ const HasNotificationPermission: () => Promise<boolean>  = () => {
 
 const Notifier: FC = () => {
   const [isSubscribed, setIsSubscribed] = useState(false)
-  const [subscription, setSubscription] = useState(null)
-  const [registration, setRegistration] = useState(null)
+  const [subscription, setSubscription] = useState<any>(null)
+  const [registration, setRegistration] = useState<any>(null)
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator && window.workbox !== undefined) {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator && (window as any).workbox !== undefined) {
       // run only in browser
       navigator.serviceWorker.ready.then((reg: any) => {
         reg.pushManager.getSubscription().then((sub: any) => {
@@ -56,21 +56,23 @@ const Notifier: FC = () => {
     }
   }, [])
 
-  const subscribeButtonOnClick = async event => {
-    event.preventDefault()
-    const sub = await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: base64ToUint8Array(process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY)
-    })
-    // TODO: you should call your API to save subscription data on server in order to send web push notification from server
-    setSubscription(sub)
-    setIsSubscribed(true)
-    console.log('web push subscribed!')
-    console.log(sub)
+  const subscribeButtonOnClick = async () => {
+    try {
+      const sub = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: base64ToUint8Array(process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY)
+      })
+      // TODO: you should call your API to save subscription data on server in order to send web push notification from server
+      setSubscription(sub)
+      setIsSubscribed(true)
+      console.log('web push subscribed!')
+      console.log(sub)
+    } catch (err) {
+      console.log('web push error', err)
+    }
   }
 
-  const unsubscribeButtonOnClick = async event => {
-    event.preventDefault()
+  const unsubscribeButtonOnClick = async () => {
     await subscription.unsubscribe()
     // TODO: you should call your API to delete or invalidate subscription data on server
     setSubscription(null)
@@ -78,14 +80,13 @@ const Notifier: FC = () => {
     console.log('web push unsubscribed!')
   }
 
-  const sendNotificationButtonOnClick = async event => {
-    event.preventDefault()
+  const sendNotificationButtonOnClick = async () => {
     if (subscription == null) {
       console.error('web push not subscribed')
       return
     }
 
-    await fetch('/api/notification', {
+    await fetch(process.env.NEXT_PUBLIC_FRONTEND_URL + '/api/notification', {
       method: 'POST',
       headers: {
         'Content-type': 'application/json'
