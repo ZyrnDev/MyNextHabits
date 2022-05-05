@@ -2,6 +2,8 @@ import { Button, Container, Divider, Heading } from "@chakra-ui/react";
 import Layout from "@components/layouts/centered";
 import { MetaOptions } from "@components/meta";
 import Ping from "@components/ping";
+import { useRegistration } from "@lib/hooks/registration";
+import { useSubscription } from "@lib/hooks/subscriptions";
 import { FC, useEffect, useState } from "react";
 
 const meta: MetaOptions = {
@@ -26,45 +28,13 @@ export default function Home() {
   );
 }
 
-const HasNotificationPermission: () => Promise<boolean>  = () => {
-  return Notification.requestPermission()
-    .then(result => {
-      return result === "granted";
-    }).catch(err => {
-      console.error(err);
-      return false
-    });
-};
-
 const Notifier: FC = () => {
-  const [isSubscribed, setIsSubscribed] = useState(false)
-  const [subscription, setSubscription] = useState<any>(null)
-  const [registration, setRegistration] = useState<any>(null)
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator && (window as any).workbox !== undefined) {
-      // run only in browser
-      navigator.serviceWorker.ready.then((reg: any) => {
-        reg.pushManager.getSubscription().then((sub: any) => {
-          if (sub && !(sub.expirationTime && Date.now() > sub.expirationTime - 5 * 60 * 1000)) {
-            setSubscription(sub)
-            setIsSubscribed(true)
-          }
-        })
-        setRegistration(reg)
-      })
-    }
-  }, [])
+  const registration = useRegistration();
+  const { subscription, isSubscribed, subscribe, unsubscribe } = useSubscription(registration);
 
   const subscribeButtonOnClick = async () => {
     try {
-      const sub = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: base64ToUint8Array(process.env.NEXT_PUBLIC_WEB_PUSH_PUBLIC_KEY)
-      })
-      // TODO: you should call your API to save subscription data on server in order to send web push notification from server
-      setSubscription(sub)
-      setIsSubscribed(true)
+      const sub = await subscribe();
       console.log('web push subscribed!')
       console.log(sub)
     } catch (err) {
@@ -73,10 +43,8 @@ const Notifier: FC = () => {
   }
 
   const unsubscribeButtonOnClick = async () => {
-    await subscription.unsubscribe()
     // TODO: you should call your API to delete or invalidate subscription data on server
-    setSubscription(null)
-    setIsSubscribed(false)
+    await unsubscribe()
     console.log('web push unsubscribed!')
   }
 
@@ -85,7 +53,7 @@ const Notifier: FC = () => {
       console.error('web push not subscribed')
       return
     }
-
+    
     await fetch(process.env.NEXT_PUBLIC_FRONTEND_URL + '/api/notification', {
       method: 'POST',
       headers: {
@@ -111,19 +79,3 @@ const Notifier: FC = () => {
     </>
   );
 };
-
-  
-
-  
-const base64ToUint8Array = (base64: any) => {
-  const padding = '='.repeat((4 - (base64.length % 4)) % 4)
-  const b64 = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/')
-
-  const rawData = window.atob(b64)
-  const outputArray = new Uint8Array(rawData.length)
-
-  for (let i = 0; i < rawData.length; ++i) {
-    outputArray[i] = rawData.charCodeAt(i)
-  }
-  return outputArray
-}
