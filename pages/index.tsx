@@ -53,15 +53,16 @@ const Notifier: FC = () => {
       console.error('web push not subscribed')
       return
     }
-    
-    await fetch(process.env.NEXT_PUBLIC_FRONTEND_URL + '/api/notification', {
+
+    // const endpoint = process.env.NEXT_PUBLIC_FRONTEND_URL + '/api/notification';
+    const endpoint = process.env.NEXT_PUBLIC_BACKEND_URL + '/users/subscribe';
+ 
+    await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-type': 'application/json'
       },
-      body: JSON.stringify({
-        subscription
-      })
+      body: JSON.stringify(subscription)
     })
   }
 
