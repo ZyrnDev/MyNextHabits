@@ -8,7 +8,9 @@ self.addEventListener('push', function (event) {
 })
 
 self.addEventListener('notificationclick', function (event) {
-  event.notification.close()
+  const notification = event.notification;
+
+  notification.close()
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
       if (clientList.length > 0) {
@@ -25,6 +27,13 @@ self.addEventListener('notificationclick', function (event) {
   )
 })
 
+self.addEventListener('notificationclose', function(event) {
+  const notification = event.notification;
+  
+  var primaryKey = notification.data.primaryKey;
+
+  console.log('Closed notification: ' + primaryKey);
+});
 // self.addEventListener('pushsubscriptionchange', function(event) {
 //   event.waitUntil(
 //       Promise.all([

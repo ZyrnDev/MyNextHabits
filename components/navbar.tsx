@@ -8,6 +8,7 @@ type LinkType = { href: string; label: string }
 const LINKS: LinkType[] = [
   { href: '/users', label: 'Users' },
   { href: '/habits', label: 'Habits' },
+  { href: '/subscriptions', label: 'Subscriptions' },
 ];
 
 const Navbar: FC<ButtonGroupProps> = ({ m, ...props }) => {
